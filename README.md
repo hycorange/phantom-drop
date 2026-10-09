@@ -1,6 +1,5 @@
 # 👻 Phantom Drop — haunted claim links for stealth TARI on Tari Ootle
 
-[![pipeline](https://gitlab.com/hycorange/phantom-drop/badges/main/pipeline.svg)](https://gitlab.com/hycorange/phantom-drop/-/pipelines)
 
 Repository: <https://gitlab.com/hycorange/phantom-drop>
 
