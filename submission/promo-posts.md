@@ -4,7 +4,7 @@
 
 👻 Phantom Drop: turn TARI into a secret link. Anyone with the link can claim it privately, even with an empty wallet. Unopened links die at "midnight" and quietly return to the sender. Riddle mode: first to solve it wins.
 Built on Tari Ootle stealth UTXOs for the October build contest 🎃
-<GITHUB_REPO_URL>
+https://gitlab.com/hycorange/phantom-drop
 
 ## Reddit — r/tari
 
@@ -20,7 +20,7 @@ For the Spooky Secrets contest I built Phantom Drop, a CLI and Rust library that
 
 It only uses Ootle's built-in primitives (stealth outputs, spend-condition trees, epoch timelocks), with no custom template. The tests run against the real Ootle engine, and the README explains what still leaks.
 
-Code (MIT): <GITHUB_REPO_URL>
+Code (MIT): https://gitlab.com/hycorange/phantom-drop
 Forum entry: <FORUM_POST_URL_OR_CONTEST_THREAD>
 
 Feedback is welcome, especially on the threat model.

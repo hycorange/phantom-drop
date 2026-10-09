@@ -3,8 +3,8 @@
 
 ## 👻 Phantom Drop — haunted claim links for stealth TARI
 
-**Code (MIT):** <GITHUB_REPO_URL>
-**Tari payment address:** <YOUR_TARI_ADDRESS>
+**Code (MIT):** https://gitlab.com/hycorange/phantom-drop
+**Tari payment address:** 12AkA1PP1qJUYK48GnfnmjsRcMqkou8XTVjSxF3vjBtf8BbLmLQsAkKzYyCMMPEq4Hp4dQuEMHDTGGvwHMLE2L6QeWB
 **Announcement:** <BLUESKY_OR_REDDIT_POST_URL>
 
 **What it is**
