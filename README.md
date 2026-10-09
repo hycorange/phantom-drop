@@ -86,6 +86,9 @@ condition trees, timelock checks, signature checks and fees.
 
 Plus unit tests for key derivation/domain separation, answer normalisation and link encoding/checksums.
 
+CI: [`.gitlab-ci.yml`](.gitlab-ci.yml) runs `cargo fmt --check`, `cargo clippy -D warnings`, `cargo test`
+and the haunted demo (its output is saved as a job artifact) on GitLab.
+
 ## CLI on the Esmeralda testnet
 
 ```bash
@@ -112,10 +115,19 @@ Global flags: `--network esmeralda|localnet`, `--indexer <url>`, `--home <dir>` 
 Links are also accepted as URL fragments (`https://anything/#phantom:…`), so they can travel as QR codes
 or web links without the fragment ever reaching a server.
 
-**Testnet status (2026‑10‑09):** `status` and `seal --dry-run` (build + sign, no submit) were exercised against the
-public Esmeralda indexer. A live seal needs testnet TARI in the sender wallet; the public Esmeralda faucet
-component was drained at the time of writing (<1000 TARI left, below the per‑take amount), so fund the
-sender address another way (e.g. L1 testnet faucet + burn‑claim) and run the commands above.
+### Live Esmeralda run: pending (faucet depleted)
+
+> **Status 2026‑10‑09:** the live testnet run has **not happened yet**. `phantom status` shows the public
+> Esmeralda faucet holds **999.65 TARI**, just under the fixed 1000 TARI per take, so `IFaucet::take` fails
+> and the faucet can't fund anyone. `status` and `seal --dry-run` (build + sign, no submit) work against
+> the public indexer. Everything the live run would exercise is covered by the engine tests above.
+> Transaction IDs will be added here once the run completes.
+
+The documented way to get testnet TARI without the faucet is to **burn Esmeralda Minotari (L1) and claim it
+on Ootle** ([official guide](https://ootle.tari.com/guides/burn-minotari/)). See
+[`docs/ESMERALDA.md`](docs/ESMERALDA.md) for the full, unattended route this project uses: sync an Esmeralda
+L1 node, SHA3x-mine a block, burn, auto-claim with `tari_ootle_walletd`, stealth-transfer to the Phantom
+sender, then `seal → open → reclaim`.
 
 ## Design notes
 

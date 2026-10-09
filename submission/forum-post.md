@@ -5,7 +5,7 @@
 
 **Code (MIT):** https://gitlab.com/hycorange/phantom-drop
 **Tari payment address:** 12AkA1PP1qJUYK48GnfnmjsRcMqkou8XTVjSxF3vjBtf8BbLmLQsAkKzYyCMMPEq4Hp4dQuEMHDTGGvwHMLE2L6QeWB
-**Announcement:** <BLUESKY_OR_REDDIT_POST_URL>
+**Announcement:** https://bsky.app/profile/hycorange.bsky.social/post/3mxh4tpegms22
 
 **What it is**
 Phantom Drop turns TARI into a secret link. Whoever holds the link can open it and receive the funds as a stealth UTXO — even with no wallet and zero balance. If nobody opens it before an expiry epoch, the link dies and only the sender can take the money back. Optional riddle locks make the link useless without the answer, so you can post a link publicly: first to solve it wins.
@@ -29,7 +29,8 @@ On chain, a sealed envelope is just a commitment, a nonce, ciphertext and a Merk
 - README with the threat model and a list of what still leaks (tx graph, timing/fees, the leaf that gets used, riddle guessability)
 
 **Status / honesty notes**
-- The engine tests and demo pass. The CLI connects to the public Esmeralda indexer and builds and signs seal transactions; <UPDATE: live testnet tx ids here if you run one>.
+- The engine tests and demo pass. The CLI connects to the public Esmeralda indexer and builds and signs seal transactions.
+- Live Esmeralda run: pending. The public faucet is stuck at 999.65 TARI, just under its fixed 1000 TARI take. I'm funding through the official L1 mine → burn → claim route and will edit this post with the seal/open/reclaim transaction IDs. <UPDATE WHEN DONE>
 - Built with an AI coding agent, then reviewed by me. All code is new for this contest.
 
 Feedback welcome. Happy Halloween 🎃
