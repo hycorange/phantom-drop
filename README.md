@@ -1,5 +1,9 @@
 # 👻 Phantom Drop — haunted claim links for stealth TARI on Tari Ootle
 
+[![pipeline](https://gitlab.com/hycorange/phantom-drop/badges/main/pipeline.svg)](https://gitlab.com/hycorange/phantom-drop/-/pipelines)
+
+Repository: <https://gitlab.com/hycorange/phantom-drop>
+
 **Phantom Drop turns an amount of TARI into a secret link.** Whoever holds the link can open it
 and receive the funds privately, **even if they have no wallet and zero balance**. If nobody opens it
 before midnight (an expiry epoch), the link dies and the sender can quietly take the money back.
@@ -48,7 +52,7 @@ sender ──seal──▶  stealth UTXO  (commitment + ciphertext + 32-byte Mer
 Requires Rust (the pinned toolchain in `rust-toolchain.toml` is installed automatically by rustup).
 
 ```bash
-git clone <this repo> phantom-drop && cd phantom-drop
+git clone https://gitlab.com/hycorange/phantom-drop.git && cd phantom-drop
 cargo test                                               # unit + 5 end-to-end engine tests
 cargo run --example haunted_demo --features sim 2>/dev/null   # narrated 5-act demo (see docs/demo-output.txt)
 cargo build --release                                    # CLI: target/release/phantom

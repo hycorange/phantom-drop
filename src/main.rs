@@ -344,6 +344,32 @@ async fn main() -> anyhow::Result<()> {
             println!("network: {network}");
             println!("indexer network: {}", provider.get_network().await?);
             println!("current epoch: {}", provider.get_epoch().await?.as_u64());
+            match provider
+                .get_substate(ootle_rs::template_types::constants::XTR_FAUCET_VAULT_ADDRESS)
+                .await
+            {
+                Ok(Some(vault)) => {
+                    let json = serde_json::to_value(&vault)?;
+                    let micro = find_key(&json, "revealed_amount").and_then(|b| match b {
+                        serde_json::Value::String(s) => s.parse::<u64>().ok(),
+                        other => other.as_u64(),
+                    });
+                    match micro {
+                        Some(m) => println!(
+                            "public faucet: {} left{}",
+                            fmt_tari(m),
+                            if m < 1_000_000_000 {
+                                " (below one 1000 TARI take: drained)"
+                            } else {
+                                ""
+                            }
+                        ),
+                        None => println!("public faucet: balance unreadable"),
+                    }
+                }
+                Ok(None) => println!("public faucet: not present on this network"),
+                Err(e) => println!("public faucet: could not read ({e})"),
+            }
         }
         Cmd::Balance { from_epoch } => {
             let key = store.master()?.wallet_key(network);
@@ -642,4 +668,14 @@ async fn main() -> anyhow::Result<()> {
         }
     }
     Ok(())
+}
+
+fn find_key<'a>(v: &'a serde_json::Value, key: &str) -> Option<&'a serde_json::Value> {
+    match v {
+        serde_json::Value::Object(m) => m
+            .get(key)
+            .or_else(|| m.values().find_map(|x| find_key(x, key))),
+        serde_json::Value::Array(a) => a.iter().find_map(|x| find_key(x, key)),
+        _ => None,
+    }
 }

@@ -1,0 +1,44 @@
+# GitLab CI for Phantom Drop: format, lint, unit + engine end-to-end tests, and the haunted demo.
+# The toolchain (1.97.1 + rustfmt + clippy) comes from rust-toolchain.toml via rustup.
+image: rust:1-bookworm
+
+variables:
+  CARGO_HOME: $CI_PROJECT_DIR/.cargo-home
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: "0"
+
+cache:
+  key:
+    files: [Cargo.lock, rust-toolchain.toml]
+  paths:
+    - .cargo-home/registry/
+    - .cargo-home/git/
+    - target/
+
+stages: [check, test]
+
+before_script:
+  - rustup show active-toolchain || rustup toolchain install
+  - rustc --version && cargo --version
+
+fmt:
+  stage: check
+  cache: []
+  script:
+    - cargo fmt --check
+
+clippy:
+  stage: check
+  script:
+    - cargo clippy --all-targets --features sim -- -D warnings
+
+test:
+  stage: test
+  timeout: 2h
+  script:
+    - cargo test
+    - cargo run --example haunted_demo --features sim 2>/dev/null | tee demo-output.txt
+  artifacts:
+    when: always
+    paths: [demo-output.txt]
+    expire_in: 30 days
