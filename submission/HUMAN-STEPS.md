@@ -1,7 +1,9 @@
 # Steps only the human can do (in order)
 
 1. Review the code and README (the rules say code quality may be judged; you're submitting it as your own entry).
-2. ✅ Done: the code is public at https://gitlab.com/hycorange/phantom-drop (CI: `.gitlab-ci.yml`).
+2. ✅ Done: the code is public at https://gitlab.com/hycorange/phantom-drop.
+   ⚠️ GitLab CI won't start until you verify your GitLab identity ("Identity verification is required in order to run CI jobs").
+   Verify once at https://gitlab.com/-/identity_verification (phone or card), then click *Run pipeline* on the Pipelines page.
 3. (Optional, strengthens the entry) Get Esmeralda testnet TARI into `phantom address`, run a live
    `seal` → `open` → `reclaim`, and add the transaction ids to the README and forum post.
 4. Get a **Tari mainnet payment address** from your own wallet (XTM prizes are paid there). Never give anyone your seed words.
