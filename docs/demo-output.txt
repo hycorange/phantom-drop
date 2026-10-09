@@ -1,0 +1,36 @@
+👻 PHANTOM DROP — haunted claim links for stealth TARI, on the real Ootle engine
+   (in-process: real Bulletproofs, balance proofs, condition trees, timelocks, signatures, fees)
+
+━━━ Act I · The crypt keeper seals three envelopes in one transaction ━━━
+  envelope #0 · 5.000000 TARI · expires epoch 100
+    phantom:3d3Myy1FX3fEoBThY9QWRjGHSaAeFKWXeSNMDRJ8kUe8xvHrd36eZrWsfwuGy8TiH4efhPPT9TNDrKMv8CjUCR8F3FWCraqaYzPmB4ZQhstdsR6N9X4fnJb5xJ2sxrN4yTcrbL4CqpjEynXw1jwQwKK
+  envelope #1 · 7.000000 TARI · expires epoch 100 · 🎃 riddle-locked
+    phantom:3d3Uvw2pUzVZp5do8UG6d4sepQro5srLKwAucEwP1vMaHQRDTvmG9NiTaZ8AdBam6mJehvJLfs4yv9wAvwmu9NzQSzeXTZeDHevEpwZ7tYFmLtwFGPdwSaz58EZQAFwSK648f1N2XMC1UkkNLCXUNGL
+  envelope #2 · 3.000000 TARI · expires epoch 20
+    phantom:3d3GsSAr3AG1hG6373Z6G2JTEWUgSFi4qhurkXiuWofMcECEB25fDf9aoTGvp7mB2AeaV1St9Xkcx2tASkuCphMRp8tMy6B4CV9DrUjnLUfYyzoSxUHVSFkJHLFWwaRWD9VA7RvyMf5sLybtUp7FxCG
+
+━━━ What the chain sees for envelope #0 ━━━
+  {"substate":{"Utxo":{"output":{"output":{"public_nonce":"06935d700d3418fff139dd6580ed28743d8ae6c524c199aa7570fb5b4fb32a2a","encrypted_data":"2ab72d979ea8d1c11e41eded0f69b08cb113fe84048ab336c37d3ba6135ac8d0dda774fdeef6c30ed0c5a49129331a35b362c24553242bbeaf4da010a1df7577d49a94f242222e2363fdd8e5773dd9fd99588d35b2bd481f5fb33b90560b0157749f173de931a5fb8299d368638a64ea65bd60d71bd3af5345d8f598dd50b3c857d98d217ead25adbe9d53f14cc530bf","minimum_value_promise":0,"viewable_balance":null},"auth":{"Script":"0d25bc343874de16ba95f0c0fc8d77c31c5b17e40d9c1806185f179d9d8c69c0"},"tag":3874387819},"is_frozen":false}},"version":0}
+  → a Pedersen commitment, a nonce, ciphertext and a 32-byte Merkle root.
+    No amount. No owner. No claim key, no refund key, no expiry, no sender.
+
+━━━ Act II · Alice (no wallet, zero balance) opens her link ━━━
+  peek: 5.000000 TARI · "🎃 For Alice — welcome to Tari!"
+  claim tx signed only by one-time key(s): ["503b740933c914d8…"] — not Alice, not the keeper
+  ✅ Alice now holds 4.950000 TARI as a stealth UTXO (fee was paid from the envelope)
+
+━━━ Act III · Envelope #1 is posted publicly with its riddle ━━━
+  peek: 7.000000 TARI · riddle: "I have a face but no eyes that see, a candle lit inside of me. What am I?"
+  Bob guesses "pumpkin" → answer ok? Some(false)
+  Mallory forces a claim with the wrong key → engine says: ExecutionFailure { code: AccessDenied, message: "At instruction #1: Access Denied: native.stealth_utxo.spend" }
+  ✅ Carol solved it and holds 6.950000 TARI
+
+━━━ Act IV · Midnight passes; envelope #2's link leaks ━━━
+  Dave tries the leaked link → engine says: ExecutionFailure { code: InvalidProof, message: "At instruction #1: Spend condition not met: builtin predicate not satisfied: BeforeEpoch(20)" }
+  ✅ the keeper reclaims 2.950000 TARI through the hidden refund branch — revealed only now
+
+━━━ Act V · Nothing to haunt twice ━━━
+  Dave replays Carol's solved link → this envelope has already been opened or reclaimed
+  envelope #1 status: Gone 👻
+
+🎃 Every transaction above was built by the same ootle-rs code the `phantom` CLI runs against Esmeralda.

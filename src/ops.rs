@@ -8,30 +8,26 @@ use anyhow::{Context, anyhow, bail, ensure};
 use async_trait::async_trait;
 use ootle_byte_type::FromByteType;
 use ootle_rs::{
-    Address,
-    Epoch,
-    TransactionRequest,
+    Address, Epoch, ToAccountAddress, TransactionRequest,
     builtin_templates::{UnsignedTransactionBuilder, faucet::IFaucet},
     crypto::{
         encrypted_data::unblind_output,
         kdfs::encrypted_data_dh_kdf_aead,
         stealth::{condition_root, script_path_witness},
     },
-    keys::OotleSecretKey,
     key_provider::PrivateKeyProvider,
+    keys::OotleSecretKey,
     provider::{Provider, WalletProvider, WantInput},
     signer,
     stealth::{Output, StealthTransfer},
     template_types::{
-        Amount,
-        UtxoAddress,
+        Amount, UtxoAddress,
         constants::TARI_TOKEN,
         crypto::{PedersenCommitmentBytes, RistrettoPublicKeyBytes},
         stealth::{SpendAuthorization, StealthInput, StealthTransferStatement},
     },
     transaction::TransactionSealSigner,
     wallet::{NetworkWallet, OotleWallet},
-    ToAccountAddress,
 };
 use tari_crypto::ristretto::{RistrettoPublicKey, RistrettoSecretKey};
 use tari_ootle_common_types::engine_types::substate::SubstateId;
@@ -49,7 +45,10 @@ pub struct KeySealer(pub RistrettoSecretKey);
 
 #[async_trait]
 impl TransactionSealSigner for KeySealer {
-    async fn seal_transaction(&self, transaction: UnsealedTransaction) -> signer::Result<Transaction> {
+    async fn seal_transaction(
+        &self,
+        transaction: UnsealedTransaction,
+    ) -> signer::Result<Transaction> {
         Ok(transaction.seal(&self.0))
     }
 }
@@ -84,7 +83,10 @@ struct FetchedUtxo {
     auth: SpendAuthorization,
 }
 
-async fn fetch_utxo<P: Provider>(provider: &P, commitment: PedersenCommitmentBytes) -> anyhow::Result<Option<FetchedUtxo>> {
+async fn fetch_utxo<P: Provider>(
+    provider: &P,
+    commitment: PedersenCommitmentBytes,
+) -> anyhow::Result<Option<FetchedUtxo>> {
     let id = SubstateId::from(UtxoAddress::new(TARI_TOKEN, commitment.into()));
     let mut found = provider
         .fetch_substates([id.clone()])
@@ -128,7 +130,11 @@ fn decrypt(
 }
 
 /// Value of a stealth UTXO owned by `owner` (used to spend the sender's own funding UTXOs).
-pub async fn utxo_value<P: Provider>(provider: &P, owner: &OotleSecretKey, commitment: PedersenCommitmentBytes) -> anyhow::Result<u64> {
+pub async fn utxo_value<P: Provider>(
+    provider: &P,
+    owner: &OotleSecretKey,
+    commitment: PedersenCommitmentBytes,
+) -> anyhow::Result<u64> {
     let utxo = fetch_utxo(provider, commitment)
         .await?
         .ok_or_else(|| anyhow!("UTXO {commitment} is spent or unknown"))?;
@@ -137,7 +143,11 @@ pub async fn utxo_value<P: Provider>(provider: &P, owner: &OotleSecretKey, commi
 
 /// What a link holder can learn: amount, message, riddle and expiry — and, if they supply an answer,
 /// whether it is right (by recomputing the committed Merkle root).
-pub async fn inspect<P: Provider>(provider: &P, link: &PhantomLink, answer: Option<&str>) -> anyhow::Result<EnvelopeStatus> {
+pub async fn inspect<P: Provider>(
+    provider: &P,
+    link: &PhantomLink,
+    answer: Option<&str>,
+) -> anyhow::Result<EnvelopeStatus> {
     let Some(utxo) = fetch_utxo(provider, link.commitment).await? else {
         return Ok(EnvelopeStatus::Gone);
     };
@@ -216,7 +226,8 @@ where
             "the selected UTXOs hold {available} µT but {total} µT is needed"
         );
         if let Some(change) = NonZeroU64::new(available - total) {
-            transfer = transfer.to_stealth_output(Output::new(sender_address.clone(), TARI_TOKEN, change));
+            transfer =
+                transfer.to_stealth_output(Output::new(sender_address.clone(), TARI_TOKEN, change));
         }
     } else {
         transfer = transfer.spend_revealed_input(total);
@@ -235,7 +246,7 @@ where
                 .and_pay_fee_from_revealed_output()
                 .prepare()
                 .await?
-        },
+        }
         Funding::Account => {
             let account = sender_address.to_account_address();
             let unsigned = Transaction::builder(network, max_epoch)
@@ -262,7 +273,7 @@ where
             .into_iter()
             .collect();
             provider.resolve_input_want_list(unsigned, &want).await?
-        },
+        }
         Funding::Utxos(commitments) => {
             let mut builder = Transaction::builder(network, max_epoch)
                 .with_fee_instructions_builder(|b| {
@@ -275,7 +286,7 @@ where
                 builder = builder.add_input(UtxoAddress::new(TARI_TOKEN, c.into()));
             }
             builder.build_unsigned()
-        },
+        }
     };
 
     let authorizer = provider.wallet().stealth_authorizer(signatures);
@@ -288,7 +299,10 @@ where
 
 /// Pair each plan with the output that was encrypted to its ghost address. Outputs are matched by
 /// trial decryption rather than by position, so a builder that reorders outputs cannot mislabel a link.
-fn match_links(statement: &StealthTransferStatement, plans: &[EnvelopePlan]) -> anyhow::Result<Vec<PhantomLink>> {
+fn match_links(
+    statement: &StealthTransferStatement,
+    plans: &[EnvelopePlan],
+) -> anyhow::Result<Vec<PhantomLink>> {
     let outputs = statement.stealth_outputs();
     let mut used = vec![false; outputs.len()];
     let mut links = Vec::with_capacity(plans.len());
@@ -363,7 +377,9 @@ where
     let payout = value
         .checked_sub(fee)
         .and_then(NonZeroU64::new)
-        .ok_or_else(|| anyhow!("the envelope holds {value} µT, not enough to cover a {fee} µT fee"))?;
+        .ok_or_else(|| {
+            anyhow!("the envelope holds {value} µT, not enough to cover a {fee} µT fee")
+        })?;
 
     let conditions = envelope_conditions(claim_key, link.refund_key, link.expiry_epoch);
     let leaf = match path {
@@ -379,7 +395,10 @@ where
     let leaf_key = public_key_bytes(leaf_secret);
 
     let (statement, _) = StealthTransfer::new(TARI_TOKEN, provider)
-        .spend_stealth_input(ghost.to_address(), StealthInput::with_witness(link.commitment, witness))
+        .spend_stealth_input(
+            ghost.to_address(),
+            StealthInput::with_witness(link.commitment, witness),
+        )
         // The leaf key seals this transaction, so it is the badge that may take the fee bucket.
         .to_revealed_output_for(fee, leaf_key)
         .to_stealth_output(

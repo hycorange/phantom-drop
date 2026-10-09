@@ -7,8 +7,8 @@
 use argon2::{Algorithm, Argon2, Params, Version};
 use blake2::{Blake2b512, Digest};
 use ootle_byte_type::ToByteType;
-use ootle_rs::{Network, keys::OotleSecretKey};
 use ootle_rs::template_types::crypto::RistrettoPublicKeyBytes;
+use ootle_rs::{Network, keys::OotleSecretKey};
 use rand::RngCore;
 use tari_crypto::{
     keys::{PublicKey, SecretKey},
@@ -29,7 +29,8 @@ pub fn hash_to_scalar(label: &str, parts: &[&[u8]]) -> RistrettoSecretKey {
         hasher.update(part);
     }
     let mut wide = hasher.finalize();
-    let key = RistrettoSecretKey::from_uniform_bytes(&wide).expect("64 bytes is the uniform scalar length");
+    let key = RistrettoSecretKey::from_uniform_bytes(&wide)
+        .expect("64 bytes is the uniform scalar length");
     wide.as_mut_slice().zeroize();
     key
 }
@@ -84,7 +85,10 @@ impl MasterSeed {
 
     /// Deterministic seed of envelope number `index`.
     pub fn envelope_seed(&self, index: u64) -> EnvelopeSeed {
-        EnvelopeSeed(hash32("envelope/seed", &[self.0.as_ref(), &index.to_le_bytes()]))
+        EnvelopeSeed(hash32(
+            "envelope/seed",
+            &[self.0.as_ref(), &index.to_le_bytes()],
+        ))
     }
 
     /// One-time refund key for the envelope with `seed`. Never reused, so a refund reveals nothing
@@ -124,7 +128,7 @@ impl EnvelopeSeed {
             Some(answer) => {
                 let stretched = stretch_answer(&self.0, answer, &KdfCost::default());
                 hash_to_scalar("claim/riddle", &[&self.0, stretched.as_ref()])
-            },
+            }
         }
     }
 }
@@ -159,7 +163,8 @@ pub fn normalize_answer(answer: &str) -> String {
 pub fn stretch_answer(seed: &[u8; 32], answer: &str, cost: &KdfCost) -> Zeroizing<[u8; 32]> {
     let normalized = Zeroizing::new(normalize_answer(answer));
     let salt = hash32("riddle/salt", &[seed]);
-    let params = Params::new(cost.memory_kib, cost.iterations, 1, Some(32)).expect("valid argon2 params");
+    let params =
+        Params::new(cost.memory_kib, cost.iterations, 1, Some(32)).expect("valid argon2 params");
     let argon = Argon2::new(Algorithm::Argon2id, Version::V0x13, params);
     let mut out = Zeroizing::new([0u8; 32]);
     argon

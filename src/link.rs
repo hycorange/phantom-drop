@@ -99,7 +99,11 @@ impl PhantomLink {
 
 impl fmt::Display for PhantomLink {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{LINK_PREFIX}{}", bs58::encode(self.to_bytes()).into_string())
+        write!(
+            f,
+            "{LINK_PREFIX}{}",
+            bs58::encode(self.to_bytes()).into_string()
+        )
     }
 }
 
@@ -110,8 +114,12 @@ impl FromStr for PhantomLink {
         let s = s.trim();
         // Accept a bare link or a web URL carrying it in the fragment, e.g. https://example/#phantom:...
         let s = s.rsplit_once('#').map(|(_, frag)| frag).unwrap_or(s);
-        let encoded = s.strip_prefix(LINK_PREFIX).ok_or(LinkError::MissingPrefix)?;
-        let bytes = bs58::decode(encoded).into_vec().map_err(|_| LinkError::Base58)?;
+        let encoded = s
+            .strip_prefix(LINK_PREFIX)
+            .ok_or(LinkError::MissingPrefix)?;
+        let bytes = bs58::decode(encoded)
+            .into_vec()
+            .map_err(|_| LinkError::Base58)?;
         Self::from_bytes(&bytes)
     }
 }
@@ -148,7 +156,13 @@ mod tests {
         let i = chars.len() - 10;
         chars[i] = if chars[i] == 'A' { 'B' } else { 'A' };
         let typo: String = chars.into_iter().collect();
-        assert_eq!(typo.parse::<PhantomLink>().unwrap_err(), LinkError::Checksum);
-        assert_eq!("phantom".parse::<PhantomLink>().unwrap_err(), LinkError::MissingPrefix);
+        assert_eq!(
+            typo.parse::<PhantomLink>().unwrap_err(),
+            LinkError::Checksum
+        );
+        assert_eq!(
+            "phantom".parse::<PhantomLink>().unwrap_err(),
+            LinkError::MissingPrefix
+        );
     }
 }

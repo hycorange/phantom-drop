@@ -3,15 +3,14 @@
 use std::num::NonZeroU64;
 
 use ootle_rs::{
-    Address,
-    Network,
+    Address, Network,
     crypto::stealth::condition_root,
     stealth::Output,
     template_types::{
+        constants::TARI_TOKEN,
         crypto::{PedersenCommitmentBytes, RistrettoPublicKeyBytes},
         rule,
         stealth::{AtomicCondition, BuiltinPredicate, SpendCondition},
-        constants::TARI_TOKEN,
     },
 };
 use tari_crypto::ristretto::RistrettoSecretKey;
@@ -48,7 +47,10 @@ pub fn envelope_conditions(
     refund_key: RistrettoPublicKeyBytes,
     expiry_epoch: u64,
 ) -> Vec<SpendCondition> {
-    vec![claim_leaf(claim_key, expiry_epoch), refund_leaf(refund_key, expiry_epoch)]
+    vec![
+        claim_leaf(claim_key, expiry_epoch),
+        refund_leaf(refund_key, expiry_epoch),
+    ]
 }
 
 #[derive(Debug, Clone)]
@@ -114,7 +116,8 @@ impl EnvelopePlan {
     }
 
     pub fn condition_root(&self) -> [u8; 32] {
-        let root = condition_root(&self.conditions()).expect("two distinct leaves form a valid tree");
+        let root =
+            condition_root(&self.conditions()).expect("two distinct leaves form a valid tree");
         root.into_array()
     }
 

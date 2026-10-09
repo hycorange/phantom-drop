@@ -33,7 +33,21 @@ hex = "0.4"
 bs58 = "0.5"
 zeroize = "1"
 async-trait = "0.1"
+futures = "0.3"
+chrono = { version = "0.4", default-features = false, features = ["clock"] }
 tari_ootle_common_types = "0.45"
 
+tari_template_test_tooling = { version = "0.45", optional = true }
+
+[features]
+default = []
+# In-process Ootle engine simulator (used by the tests and the `haunted_demo` example).
+sim = ["dep:tari_template_test_tooling"]
+
 [dev-dependencies]
+phantom-drop = { path = ".", features = ["sim"] }
 tari_template_test_tooling = "0.45"
+
+[[example]]
+name = "haunted_demo"
+required-features = ["sim"]
