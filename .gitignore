@@ -1,3 +1,11 @@
 /target
 *.phantom-secret
 .phantom/
+*.key
+.env
+*.env
+*.sqlite
+*.db
+secrets/
+burn_proofs/
+seed_words*

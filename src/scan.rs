@@ -28,10 +28,35 @@ pub async fn scan_owned<W: NetworkWallet + Send + Sync>(
     key: &OotleSecretKey,
     from_epoch: Epoch,
 ) -> anyhow::Result<Vec<OwnedUtxo>> {
+    // Escape hatch when the indexer's UTXO stream is unreliable: test known UTXO substate ids
+    // (e.g. the outputs of a funding transaction) directly, comma-separated in PHANTOM_UTXOS.
+    if let Ok(ids) = std::env::var("PHANTOM_UTXOS") {
+        let mut owned = Vec::new();
+        for id in ids.split(',').map(str::trim).filter(|s| !s.is_empty()) {
+            let substate_id: SubstateId = id
+                .parse()
+                .map_err(|e| anyhow::anyhow!("bad substate id {id}: {e:?}"))?;
+            let substate = provider.fetch_substate(substate_id.clone()).await?;
+            if let Some((commitment, value, memo)) =
+                try_decrypt_substate(&substate_id, &substate, key.view_only_secret())
+            {
+                owned.push(OwnedUtxo {
+                    commitment,
+                    value,
+                    memo,
+                });
+            }
+        }
+        return Ok(owned);
+    }
     let network = key.network();
     let num_preshards = provider.get_num_preshards().await?;
     let mut cursor = ShardCursor::genesis(num_preshards);
     let mut candidates = Vec::new();
+    // The public indexer may cut a stream short; keep resuming from the cursor until every shard
+    // has sent its EndOfShard watermark.
+    let mut done_shards = std::collections::HashSet::new();
+    let mut passes = 0u32;
 
     loop {
         let request = StealthUtxoWatchRequest {
@@ -39,12 +64,13 @@ pub async fn scan_owned<W: NetworkWallet + Send + Sync>(
             from_epoch,
             shard_state_versions: cursor.to_pairs(),
             unspent_only: true,
-            per_shard_limit: 2000,
+            per_shard_limit: 500,
         };
         let mut stream = Box::pin(provider.watch_stealth_utxos(request).into_stream());
         let mut more = false;
         while let Some(frame) = stream.next().await {
-            match frame? {
+            let frame = frame?;
+            match frame {
                 StealthUtxoFrame::StartOfShard { has_more, .. } => more |= has_more,
                 StealthUtxoFrame::Unspent { tag, public_nonce } => {
                     let Ok(nonce) = FromByteType::try_from_byte_type(&public_nonce) else {
@@ -60,11 +86,16 @@ pub async fn scan_owned<W: NetworkWallet + Send + Sync>(
                 StealthUtxoFrame::EndOfShard {
                     shard,
                     max_state_version,
-                } => cursor.observe(shard, max_state_version),
+                } => {
+                    done_shards.insert(format!("{shard:?}"));
+                    cursor.observe(shard, max_state_version)
+                }
                 _ => {}
             }
         }
-        if !more {
+        passes += 1;
+        let complete = done_shards.len() as u64 >= u64::from(u32::from(num_preshards));
+        if (!more && complete) || passes >= 200 {
             break;
         }
     }

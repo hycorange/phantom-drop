@@ -30,7 +30,17 @@ On chain, a sealed envelope is just a commitment, a nonce, ciphertext and a Merk
 
 **Status / honesty notes**
 - The engine tests and demo pass. The CLI connects to the public Esmeralda indexer and builds and signs seal transactions.
-- Live Esmeralda run: pending. The public faucet is stuck at 999.65 TARI, just under its fixed 1000 TARI take. I'm funding through the official L1 mine → burn → claim route and will edit this post with the seal/open/reclaim transaction IDs. <UPDATE WHEN DONE>
+- Live Esmeralda run: ✅ done 2026‑10‑12 (L1 burn → Ootle claim → seal → zero‑balance open → double‑open rejected → reclaim after expiry). Details below.
+
+**Live testnet proof (Esmeralda)**
+- L1 burn 200 tXTM: wallet tx 15835725866294681451, block 972736 — https://textexplore-esmeralda.tari.com/search_kernels?nonces=24892becc5184b1e806ece017c5462e34f71bd17214ff1e622415acc7beebd70&signatures=40a099d58b46e6495712006e75ea3dbba005aad210f6b7522383baa5aace3309
+- Ootle ClaimBurn: https://explorer.tari.mw/tx/b878a9103fc17ced2725038152eedae1a78c8a2a9b86213cb9cdbfa116aba85b
+- Stealth funding 60 tTARI → phantom sender: https://explorer.tari.mw/tx/a160f3f7d7ad326d2f92467e3d6df74b02f3352e5d5c67c7efc924c5e37ff026
+- Seal 2 × 5 TARI (expiry epoch 12161): https://explorer.tari.mw/tx/433611281465314a3c96a0b93566d6f0dd9e3713fde64bbb984b067310224805
+- Open #0 into a fresh zero‑balance key (4.95 TARI received): https://explorer.tari.mw/tx/c9855b67b8d72dc7b0bdd1600fe7665607247a2f7bd51218239f3a99d7206fd0
+- Second open of #0 → rejected “already opened or reclaimed”
+- Reclaim #1 after expiry via the hidden refund leaf: https://explorer.tari.mw/tx/06d79409d49b842169c5eaa78dfad1dcef210f20ea1a3bf09867ffc46d23f8fb
+- Execution results (JSON) for each Ootle tx: https://ootle-indexer-a.tari.com/transactions/<tx id>/result · full terminal capture in docs/live-run-output.txt
 - Built with an AI coding agent, then reviewed by me. All code is new for this contest.
 
 Feedback welcome. Happy Halloween 🎃

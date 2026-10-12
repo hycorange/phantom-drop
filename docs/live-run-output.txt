@@ -1,0 +1,63 @@
+[2026-10-12 12:18:39 CST] approved live proof: burning 200 tXTM to claim key <claim-pubkey>
+[2026-10-12 12:18:52 CST] MISTAKE: burn tx 3077477363113607069 sent WITHOUT claim key (empty claim_public_key); already Broadcast, cannot cancel; 200 tXTM unclaimable (testnet)
+[2026-10-12 12:37:13 CST] burn #2: 200 tXTM with claim key <claim-pubkey>
+[2026-10-12 13:50:11 CST] walletd claimed burn; balance 199986762 µT
+{"jsonrpc":"2.0","result":{"address":"component_d056ea85ffa731763451483cf1e756b248c845130a66a54174108ceba14a534b","balances":[{"balance":"0","confidential_balance":"199986762","divisibility":6,"resource_address":"resource_0101010101010101010101010101010101010101010101010101010101010101","resource_type":"Stealth","token_symbol":"tTARI","vault_address":null}]},"id":1}
+14:49 INFO  ✅ Auto-submitted claim burn for '<claim-pubkey>-c6e4ea916acf65b53db9c10e7a1f8601cc0711184ea13b2eb184fe8e822cf954.json' (tx_id: b878a9103fc17ced2725038152eedae1a78c8a2a9b86213cb9cdbfa116aba85b)
+14:49 INFO  Tracking claim burn transaction b878a9103fc17ced2725038152eedae1a78c8a2a9b86213cb9cdbfa116aba85b for proof file <claim-pubkey>-c6e4ea916acf65b53db9c10e7a1f8601cc0711184ea13b2eb184fe8e822cf954.json
+14:49 INFO  Claim burn for '<claim-pubkey>-c6e4ea916acf65b53db9c10e7a1f8601cc0711184ea13b2eb184fe8e822cf954.json' (tx_id: b878a9103fc17ced2725038152eedae1a78c8a2a9b86213cb9cdbfa116aba85b) was accepted
+14:49 INFO  Claim burn transaction b878a9103fc17ced2725038152eedae1a78c8a2a9b86213cb9cdbfa116aba85b accepted, marking proof <claim-pubkey>-c6e4ea916acf65b53db9c10e7a1f8601cc0711184ea13b2eb184fe8e822cf954.json as claimed
+14:49 INFO  Burn proof <claim-pubkey>-c6e4ea916acf65b53db9c10e7a1f8601cc0711184ea13b2eb184fe8e822cf954.json marked as claimed
+[2026-10-12 13:50:11 CST] === STEP transfer ===
+[2026-10-12 13:50:12 CST] phantom sender otl_esm_1fe88zatv3m5sh8ppfkl3mpnzlxn4t4594alujpf0wfltfkdhr3yc58vdczc4unqnrn8j3myj7jalqy4l00q5z0npxx0vxm76nz04yvs7rtmpa ; epoch 12160
+[2026-10-12 13:50:12 CST] funding transfer: {"jsonrpc":"2.0","result":{"transaction_id":"a160f3f7d7ad326d2f92467e3d6df74b02f3352e5d5c67c7efc924c5e37ff026"},"id":1}
+network: esmeralda
+indexer network: esmeralda
+current epoch: 12160
+public faucet: 999.651320 TARI left (below one 1000 TARI take: drained)
+$ phantom seal --amount 5 --count 2 --expires-in 1 --fund utxos --message "👻 Phantom Drop live on Esmeralda"
+📨 submitting 433611281465314a3c96a0b93566d6f0dd9e3713fde64bbb984b067310224805 …
+🏁 finalized: Commit
+   fees paid: 0.050000 TARI
+────────────────────────────────────────────────────────────
+👻 5.000000 TARI · expires at epoch 12161
+phantom:3qLXCnpTKrZE5Tn8YNRLfbdxWRPmURNcN7TWYhJpbFMSLJJrDQwGyrnyeyorgHMgWLNTVPTyCoByLbMpTz29JahP8G6wPZTNKGd8ZRxPmLwNUf2SGFHWNwAhVFzitSQYUmjUtVriFDMSr5gnNEcitfD
+────────────────────────────────────────────────────────────
+👻 5.000000 TARI · expires at epoch 12161
+phantom:3qLW4sqqPWS2hyWDrbQ7ppzEfCSLaeHboi1PyHd7aGC5abJ1bsDdMcY5T6CBQTR3sPEkrbYjbB55qJoB9h2FqtDK713FgiyqvmvgGbWuZTNXBtTn6Y1pcioGSKGe6dt1MVz7B1sVxk5YNeyBjZaxdy3
+────────────────────────────────────────────────────────────
+Share a link privately (or publicly, if it is riddle-locked). Whoever holds it can `phantom open` it.
+[2026-10-12 14:03:25 CST] seal done
+$ phantom peek <link #0>
+👻 holds 5.000000 TARI
+💌 👻 Phantom Drop live on Esmeralda
+⏳ open before epoch 12161 (now 12160)
+$ phantom open <link #0> --new-wallet recipient.key
+🆕 new wallet key written to ./recipient.key
+📨 submitting c9855b67b8d72dc7b0bdd1600fe7665607247a2f7bd51218239f3a99d7206fd0 …
+🏁 finalized: Commit
+   fees paid: 0.050000 TARI
+🎁 4.950000 TARI → otl_esm_16f3lhg86ccmgfjcftp3g8tkex7enyxdv34dfdscznhpttf6zk5g5ytcaw6r95s56le5tk3g5ls2vs2e4su4gzaw50nt3gnz89cgjqls05qe2t
+[2026-10-12 14:04:33 CST] open #0 done
+$ phantom open <link #0> --new-wallet recipient2.key   # second open must fail
+🆕 new wallet key written to ./recipient2.key
+Error: this envelope has already been opened or reclaimed
+$ phantom list
+#0        5.000000 TARI  opened/reclaimed
+#1        5.000000 TARI  waiting (expires 12161)
+[2026-10-12 14:04:37 CST] double-open checked; waiting for epoch 12161 to reclaim #1
+$ phantom reclaim
+📨 submitting 06d79409d49b842169c5eaa78dfad1dcef210f20ea1a3bf09867ffc46d23f8fb …
+🏁 finalized: Commit
+   fees paid: 0.050000 TARI
+↩️  #1 reclaimed 4.950000 TARI
+1 envelope(s) reclaimed
+$ phantom list
+#0        5.000000 TARI  opened/reclaimed
+#1        5.000000 TARI  opened/reclaimed
+$ phantom status
+network: esmeralda
+indexer network: esmeralda
+current epoch: 12161
+public faucet: 999.651320 TARI left (below one 1000 TARI take: drained)
+[2026-10-12 14:23:51 CST] reclaim #1 done: 06d79409d49b842169c5eaa78dfad1dcef210f20ea1a3bf09867ffc46d23f8fb

@@ -114,13 +114,22 @@ Global flags: `--network esmeralda|localnet`, `--indexer <url>`, `--home <dir>` 
 Links are also accepted as URL fragments (`https://anything/#phantom:…`), so they can travel as QR codes
 or web links without the fragment ever reaching a server.
 
-### Live Esmeralda run: pending (faucet depleted)
+### Live testnet proof (Esmeralda, 2026‑10‑12)
 
-> **Status 2026‑10‑09:** the live testnet run has **not happened yet**. `phantom status` shows the public
-> Esmeralda faucet holds **999.65 TARI**, just under the fixed 1000 TARI per take, so `IFaucet::take` fails
-> and the faucet can't fund anyone. `status` and `seal --dry-run` (build + sign, no submit) work against
-> the public indexer. Everything the live run would exercise is covered by the engine tests above.
-> Transaction IDs will be added here once the run completes.
+The full flow ran on the public Esmeralda testnet: L1 burn → Ootle claim → private funding → seal → zero‑balance open → double‑open rejected → expiry → reclaim through the hidden refund branch.
+Full terminal capture: [`docs/live-run-output.txt`](docs/live-run-output.txt).
+
+| step | tx | where / when | public link |
+|---|---|---|---|
+| L1 burn 200 tXTM to the walletd claim key | wallet tx `15835725866294681451`, kernel excess `a4d9fd31…9505` | L1 block **972736** | [textexplore kernel search](https://textexplore-esmeralda.tari.com/search_kernels?nonces=24892becc5184b1e806ece017c5462e34f71bd17214ff1e622415acc7beebd70&signatures=40a099d58b46e6495712006e75ea3dbba005aad210f6b7522383baa5aace3309) |
+| Ootle `ClaimBurn` (auto, `tari_ootle_walletd`) | `b878a9103fc17ced2725038152eedae1a78c8a2a9b86213cb9cdbfa116aba85b` | epoch 12160 · Commit | [Veil](https://explorer.tari.mw/tx/b878a9103fc17ced2725038152eedae1a78c8a2a9b86213cb9cdbfa116aba85b) · [indexer](https://ootle-indexer-a.tari.com/transactions/b878a9103fc17ced2725038152eedae1a78c8a2a9b86213cb9cdbfa116aba85b/result) |
+| stealth transfer 60 tTARI → `phantom address` | `a160f3f7d7ad326d2f92467e3d6df74b02f3352e5d5c67c7efc924c5e37ff026` | epoch 12160 · Commit | [Veil](https://explorer.tari.mw/tx/a160f3f7d7ad326d2f92467e3d6df74b02f3352e5d5c67c7efc924c5e37ff026) · [indexer](https://ootle-indexer-a.tari.com/transactions/a160f3f7d7ad326d2f92467e3d6df74b02f3352e5d5c67c7efc924c5e37ff026/result) |
+| `phantom seal --amount 5 --count 2 --expires-in 1` (funded from the stealth UTXO) | `433611281465314a3c96a0b93566d6f0dd9e3713fde64bbb984b067310224805` | epoch 12160 · Commit · expiry 12161 | [Veil](https://explorer.tari.mw/tx/433611281465314a3c96a0b93566d6f0dd9e3713fde64bbb984b067310224805) · [indexer](https://ootle-indexer-a.tari.com/transactions/433611281465314a3c96a0b93566d6f0dd9e3713fde64bbb984b067310224805/result) |
+| `phantom open` #0 into a brand‑new, zero‑balance key → 4.95 TARI | `c9855b67b8d72dc7b0bdd1600fe7665607247a2f7bd51218239f3a99d7206fd0` | epoch 12160 · Commit | [Veil](https://explorer.tari.mw/tx/c9855b67b8d72dc7b0bdd1600fe7665607247a2f7bd51218239f3a99d7206fd0) · [indexer](https://ootle-indexer-a.tari.com/transactions/c9855b67b8d72dc7b0bdd1600fe7665607247a2f7bd51218239f3a99d7206fd0/result) |
+| second `open` of #0 | — | rejected: “already opened or reclaimed” | — |
+| `phantom reclaim` #1 after expiry (hidden refund leaf) → 4.95 TARI back | `06d79409d49b842169c5eaa78dfad1dcef210f20ea1a3bf09867ffc46d23f8fb` | epoch 12161 · Commit | [Veil](https://explorer.tari.mw/tx/06d79409d49b842169c5eaa78dfad1dcef210f20ea1a3bf09867ffc46d23f8fb) · [indexer](https://ootle-indexer-a.tari.com/transactions/06d79409d49b842169c5eaa78dfad1dcef210f20ea1a3bf09867ffc46d23f8fb/result) |
+
+Notes: the L1 wallet ran against the public base‑node RPC (`-p wallet.http_server_url=https://rpc.esmeralda.tari.com`), so no local node or mining was needed (the L1 tXTM came from the community faucet). An earlier 200 tXTM burn (wallet tx `3077477363113607069`, block 972709) was mis‑sent without a claim key and is unclaimable. The public indexer now rejects `per_shard_limit` 2000 on `/utxos/stream` and sometimes cuts streams short, so `scan.rs` uses 500, resumes until every shard has reported, and accepts `PHANTOM_UTXOS=<utxo ids>` as an escape hatch (used for the seal above).
 
 The documented way to get testnet TARI without the faucet is to **burn Esmeralda Minotari (L1) and claim it
 on Ootle** ([official guide](https://ootle.tari.com/guides/burn-minotari/)). See
