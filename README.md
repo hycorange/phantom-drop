@@ -1,7 +1,8 @@
 # 👻 Phantom Drop — haunted claim links for stealth TARI on Tari Ootle
 
+[![CI](https://github.com/hycorange/phantom-drop/actions/workflows/ci.yml/badge.svg)](https://github.com/hycorange/phantom-drop/actions/workflows/ci.yml)
 
-Repository: <https://gitlab.com/hycorange/phantom-drop>
+Repository: <https://gitlab.com/hycorange/phantom-drop> (primary) · GitHub mirror: <https://github.com/hycorange/phantom-drop>
 
 **Phantom Drop turns an amount of TARI into a secret link.** Whoever holds the link can open it
 and receive the funds privately, **even if they have no wallet and zero balance**. If nobody opens it
@@ -85,8 +86,10 @@ condition trees, timelock checks, signature checks and fees.
 
 Plus unit tests for key derivation/domain separation, answer normalisation and link encoding/checksums.
 
-CI: [`.gitlab-ci.yml`](.gitlab-ci.yml) runs `cargo fmt --check`, `cargo clippy -D warnings`, `cargo test`
-and the haunted demo (its output is saved as a job artifact) on GitLab.
+CI runs on GitHub Actions ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)): `cargo fmt --check`, `cargo test`
+and the haunted demo, on every push to `main`. Runs: <https://github.com/hycorange/phantom-drop/actions/workflows/ci.yml>.
+GitLab stays the primary repository; its pipeline ([`.gitlab-ci.yml`](.gitlab-ci.yml)) is kept but doesn't run there
+because of account limits. Latest local run: [`docs/test-output.txt`](docs/test-output.txt) (9 tests, all passing).
 
 ## CLI on the Esmeralda testnet
 

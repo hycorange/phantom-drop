@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: "0"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      # rust-toolchain.toml pins the toolchain; rustup installs it on first use.
+      - name: Toolchain
+        run: rustup show active-toolchain || rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+      - name: Format
+        run: cargo fmt --check
+      - name: Tests (unit + engine end-to-end)
+        run: cargo test
+      - name: Haunted demo
+        run: cargo run --example haunted_demo --features sim 2>/dev/null | tee demo-output.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: demo-output
+          path: demo-output.txt
+          if-no-files-found: ignore
