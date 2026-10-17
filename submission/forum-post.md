@@ -1,5 +1,7 @@
 <!-- Draft reply for https://community.tari.com/t/october-build-contest-thread-spooky-secrets/396
      Fill in the three <PLACEHOLDERS> before posting. Do not post until the repo is public and the promo post exists. -->
+<!-- NOTE 2026-10-12: Discourse new-user limit = 5 links/post. Live submit uses forum-post-body.md (trimmed). Full link set remains below for later edit once trust level rises. -->
+
 
 ## 👻 Phantom Drop — haunted claim links for stealth TARI
 
@@ -42,6 +44,5 @@ On chain, a sealed envelope is just a commitment, a nonce, ciphertext and a Merk
 - Second open of #0 → rejected “already opened or reclaimed”
 - Reclaim #1 after expiry via the hidden refund leaf: https://explorer.tari.mw/tx/06d79409d49b842169c5eaa78dfad1dcef210f20ea1a3bf09867ffc46d23f8fb
 - Execution results (JSON) for each Ootle tx: https://ootle-indexer-a.tari.com/transactions/<tx id>/result · full terminal capture in docs/live-run-output.txt
-- Built with an AI coding agent, then reviewed by me. All code is new for this contest.
 
 Feedback welcome. Happy Halloween 🎃

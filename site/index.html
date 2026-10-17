@@ -101,6 +101,6 @@ const live=[["seal","2 × 5 TARI in one tx, expires epoch 12161","43361128146531
 ["open #0","new wallet, zero balance, receives 4.95 TARI","c9855b67b8d72dc7b0bdd1600fe7665607247a2f7bd51218239f3a99d7206fd0"],
 ["open #0 again","rejected: already opened or reclaimed",""],
 ["reclaim #1","after epoch 12161, hidden refund branch, 4.95 TARI back","06d79409d49b842169c5eaa78dfad1dcef210f20ea1a3bf09867ffc46d23f8fb"]];
-document.getElementById('live').innerHTML='<table>'+live.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}${r[2]?`<div class="links dim">tx ${r[2]}</div>`:''}</td></tr>`).join('')+'</table>';
+document.getElementById('live').innerHTML='<table>'+live.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}${r[2]?`<div class="links"><a href="https://explorer.tari.mw/tx/${r[2]}">tx ${r[2].slice(0,16)}…</a></div>`:''}</td></tr>`).join('')+'</table>';
 </script>
 </body></html>
