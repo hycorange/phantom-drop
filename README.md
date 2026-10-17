@@ -4,6 +4,8 @@
 
 Repository: <https://gitlab.com/hycorange/phantom-drop> (primary) · GitHub mirror: <https://github.com/hycorange/phantom-drop>
 
+**Try it in the browser:** <https://hycorange.github.io/phantom-drop/> (step-through of the five acts, what the chain sees vs. what the link holder sees, and the live Esmeralda run).
+
 **Phantom Drop turns an amount of TARI into a secret link.** Whoever holds the link can open it
 and receive the funds privately, **even if they have no wallet and zero balance**. If nobody opens it
 before midnight (an expiry epoch), the link dies and the sender can quietly take the money back.

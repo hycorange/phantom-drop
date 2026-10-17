@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>👻 Phantom Drop — haunted claim links for stealth TARI</title>
+<meta name="description" content="Turn TARI into a secret link. Whoever holds it can claim privately, even with zero balance. Unopened links die at midnight and the sender reclaims through a hidden branch.">
+<style>
+:root{--bg:#0d0b14;--card:#17131f;--ink:#e9e4f5;--dim:#9a92ad;--pump:#ff8a1f;--ok:#7be38b;--bad:#ff6b6b;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(1200px 600px at 70% -10%,#2a1640 0,var(--bg) 60%);color:var(--ink);font:16px/1.55 system-ui,-apple-system,Segoe UI,sans-serif}
+main{max-width:920px;margin:0 auto;padding:40px 20px 80px}h1{font-size:2.1rem;margin:.2em 0}h2{margin-top:2.2em;color:var(--pump)}a{color:#c9a7ff}
+.lead{color:var(--dim);font-size:1.1rem}.btns a{display:inline-block;margin:6px 8px 0 0;padding:8px 14px;border:1px solid #3a2f4d;border-radius:10px;text-decoration:none}
+.card{background:var(--card);border:1px solid #2a2238;border-radius:14px;padding:18px 20px;margin:14px 0}
+pre,code{font-family:var(--mono);font-size:.86rem}pre{white-space:pre-wrap;word-break:break-all;background:#0f0c16;border-radius:10px;padding:12px;margin:8px 0}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}.tabs button{background:#211a2d;color:var(--ink);border:1px solid #3a2f4d;border-radius:999px;padding:7px 14px;cursor:pointer;font:inherit}
+.tabs button.on{background:var(--pump);color:#1a0f00;border-color:var(--pump)}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:720px){.split{grid-template-columns:1fr}}
+.ok{color:var(--ok)}.bad{color:var(--bad)}.dim{color:var(--dim)}table{border-collapse:collapse;width:100%}td{padding:6px 8px;border-bottom:1px solid #2a2238;vertical-align:top}
+.step{border-left:3px solid var(--pump);padding-left:12px;margin:12px 0}img{max-width:100%;border-radius:10px;border:1px solid #2a2238}
+.links{font-family:var(--mono);font-size:.8rem;word-break:break-all}
+</style>
+</head>
+<body><main>
+<h1>👻 Phantom Drop</h1>
+<p class="lead">Haunted claim links for stealth TARI on Tari Ootle. Seal an amount into a secret link. Whoever holds the link can open it and receive the funds privately, even with no wallet and zero balance. If nobody opens it before midnight (an expiry epoch), the link dies and only the sender can take the money back.</p>
+<div class="btns"><a href="https://gitlab.com/hycorange/phantom-drop">Code (GitLab)</a><a href="https://github.com/hycorange/phantom-drop">GitHub mirror</a><a href="https://github.com/hycorange/phantom-drop/actions/workflows/ci.yml">CI runs</a><a href="https://community.tari.com/t/october-build-contest-thread-spooky-secrets/396">Contest thread</a></div>
+<p class="dim">Built for the Tari October Build Contest, Spooky Secrets. Native Ootle stealth primitives only, no custom template.</p>
+
+<h2>Peek inside a sealed envelope</h2>
+<p>Same envelope, two viewers. Toggle between what anyone scanning the chain sees and what the person holding the link sees.</p>
+<div class="tabs" id="viewTabs"><button class="on" data-v="chain">👀 Chain observer</button><button data-v="holder">🔑 Link holder</button></div>
+<div class="card" id="viewBox"></div>
+
+<h2>Try the five acts</h2>
+<p>This is the narrated demo from the repo (<code>cargo run --example haunted_demo --features sim</code>), replayed step by step. Every transaction runs on the real Ootle engine in-process: Bulletproofs, balance proofs, condition trees, timelocks, signatures and fees. CI re-runs it on every push.</p>
+<div class="tabs" id="actTabs"></div>
+<div class="card" id="actBox"></div>
+
+<h2>Live on Esmeralda testnet</h2>
+<p>The same <code>phantom</code> CLI, run against the public Esmeralda network on 2026-10-12. Two envelopes sealed in one transaction, one opened by a brand-new wallet, a second open rejected, and the other reclaimed after expiry.</p>
+<div class="card" id="live"></div>
+
+<h2>Why it's spooky</h2>
+<div class="card"><table>
+<tr><td>Amount</td><td>Hidden. Pedersen commitment plus range proof.</td></tr>
+<tr><td>Owner or recipient</td><td>None. Locked by a Merkle root, not a public key.</td></tr>
+<tr><td>Claim key, refund key, expiry</td><td>Hidden behind the root until a branch is used.</td></tr>
+<tr><td>Message or riddle</td><td>Encrypted memo, readable only with the link.</td></tr>
+<tr><td>Sender</td><td>Not linkable when funded from stealth UTXOs (<code>--fund utxos</code>).</td></tr>
+<tr><td>Zero-funds claim</td><td>The claim pays its fee out of the envelope itself (5 TARI in, 4.95 out).</td></tr>
+<tr><td>Riddle locks</td><td>Claim key derived from Argon2id(answer), so a link can be posted publicly without being front-run.</td></tr>
+</table></div>
+
+<h2>Run it yourself</h2>
+<pre>git clone https://gitlab.com/hycorange/phantom-drop.git && cd phantom-drop
+cargo test
+cargo run --example haunted_demo --features sim 2>/dev/null
+cargo build --release   # CLI: target/release/phantom (see docs/ESMERALDA.md for testnet)</pre>
+<p class="dim">MIT licensed. Testnet only; nothing here touches real funds.</p>
+</main>
+<script>
+const chain=`{"substate":{"Utxo":{"output":{"output":{
+  "public_nonce":"06935d700d3418fff139dd6580ed28743d8ae6c524c199aa7570fb5b4fb32a2a",
+  "encrypted_data":"2ab72d979ea8d1c11e41eded0f69b08cb113fe84048ab336c37d3ba6135ac8d0dda774fd…",
+  "minimum_value_promise":0,"viewable_balance":null},
+  "auth":{"Script":"0d25bc343874de16ba95f0c0fc8d77c31c5b17e40d9c1806185f179d9d8c69c0"},
+  "tag":3874387819},"is_frozen":false}},"version":0}`;
+const views={
+chain:`<pre>${chain}</pre><p>A commitment, a nonce, ciphertext and a 32-byte Merkle root.</p><p class="bad">No amount. No owner. No claim key, no refund key, no expiry, no sender.</p>`,
+holder:`<pre>$ phantom peek phantom:3d3Myy1FX3fEoBThY9QWRjGH…
+👻 holds 5.000000 TARI
+💌 🎃 For Alice — welcome to Tari!
+⏳ open before epoch 100</pre><p>The link carries the one-time claim secret and the key to the memo. Only its holder can read the amount and message, and only before the expiry epoch.</p><p class="ok">The condition tree behind the root: claim leaf = sig(one-time claim key) ∧ epoch &lt; E · refund leaf = sig(one-time refund key) ∧ epoch ≥ E.</p>`};
+const acts=[
+["I · Seal",`<div class="step">The crypt keeper seals three envelopes in <b>one</b> transaction.</div>
+<p>#0 · 5 TARI · expires epoch 100<br>#1 · 7 TARI · expires epoch 100 · 🎃 riddle-locked<br>#2 · 3 TARI · expires epoch 20</p>
+<div class="links">phantom:3d3Myy1FX3fEoBThY9QWRjGHSaAeFKWXeSNMDRJ8kUe8xvHrd36eZrWsfwuGy8TiH4efhPPT9TNDrKMv8CjUCR8F3FWCraqaYzPmB4ZQhstdsR6N9X4fnJb5xJ2sxrN4yTcrbL4CqpjEynXw1jwQwKK</div>`],
+["II · Open",`<div class="step">Alice has no wallet and zero balance. She opens her link.</div>
+<pre>peek: 5.000000 TARI · "🎃 For Alice — welcome to Tari!"
+claim tx signed only by one-time key(s): ["503b740933c914d8…"]</pre>
+<p class="ok">✅ Alice now holds 4.95 TARI as a stealth UTXO. The fee came out of the envelope.</p>`],
+["III · Riddle",`<div class="step">Envelope #1 is posted publicly with its riddle.</div>
+<pre>riddle: "I have a face but no eyes that see, a candle lit inside of me. What am I?"
+Bob guesses "pumpkin" → answer ok? false
+Mallory forces a claim with the wrong key →
+  ExecutionFailure { AccessDenied: native.stealth_utxo.spend }</pre>
+<p class="ok">✅ Carol solved it and holds 6.95 TARI.</p>`],
+["IV · Midnight",`<div class="step">Midnight passes. Envelope #2's link leaks.</div>
+<pre>Dave tries the leaked link →
+  ExecutionFailure { InvalidProof: Spend condition not met: BeforeEpoch(20) }</pre>
+<p class="ok">✅ The keeper reclaims 2.95 TARI through the hidden refund branch, revealed only now.</p>`],
+["V · Gone",`<div class="step">Nothing to haunt twice.</div>
+<pre>Dave replays Carol's solved link → this envelope has already been opened or reclaimed
+envelope #1 status: Gone 👻</pre>
+<p>The UTXO is consumed by the first valid spend; the engine rejects replays.</p>`]];
+function tabs(el,items,box,render){items.forEach((it,i)=>{const b=document.createElement('button');b.textContent=it[0];if(!i)b.className='on';b.onclick=()=>{el.querySelectorAll('button').forEach(x=>x.className='');b.className='on';box.innerHTML=it[1]};el.appendChild(b)});box.innerHTML=items[0][1]}
+tabs(document.getElementById('actTabs'),acts,document.getElementById('actBox'));
+const vt=document.getElementById('viewTabs'),vb=document.getElementById('viewBox');vb.innerHTML=views.chain;
+vt.querySelectorAll('button').forEach(b=>b.onclick=()=>{vt.querySelectorAll('button').forEach(x=>x.className='');b.className='on';vb.innerHTML=views[b.dataset.v]});
+const live=[["seal","2 × 5 TARI in one tx, expires epoch 12161","433611281465314a3c96a0b93566d6f0dd9e3713fde64bbb984b067310224805"],
+["open #0","new wallet, zero balance, receives 4.95 TARI","c9855b67b8d72dc7b0bdd1600fe7665607247a2f7bd51218239f3a99d7206fd0"],
+["open #0 again","rejected: already opened or reclaimed",""],
+["reclaim #1","after epoch 12161, hidden refund branch, 4.95 TARI back","06d79409d49b842169c5eaa78dfad1dcef210f20ea1a3bf09867ffc46d23f8fb"]];
+document.getElementById('live').innerHTML='<table>'+live.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}${r[2]?`<div class="links dim">tx ${r[2]}</div>`:''}</td></tr>`).join('')+'</table>';
+</script>
+</body></html>
